@@ -1,0 +1,10 @@
+$ kubectl apply -f manifests/1-multitool-pod.yaml
+pod/multitool-client created
+$ kubectl wait --for=condition=Ready pod/multitool-client --timeout=120s
+pod/multitool-client condition met
+$ kubectl exec multitool-client -- curl -s -m 5 nginx-multitool-svc:80 | grep -E "<title>|<h1>"
+<title>Welcome to nginx!</title>
+<h1>Welcome to nginx!</h1>
+$ for i in 1 2 3 4 5 6 7 8; do kubectl exec multitool-client -- curl -s -m 5 nginx-multitool-svc:1180 | cut -d" " -f1-9; done | sort | uniq -c
+      4 WBITT Network MultiTool (with NGINX) - nginx-multitool-8ccdd6fc7-6t4nk - 10.1.144.121
+      4 WBITT Network MultiTool (with NGINX) - nginx-multitool-8ccdd6fc7-dfs5j - 10.1.144.120

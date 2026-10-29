@@ -1,0 +1,12 @@
+# Отдельный Pod-клиент: с него проверяем доступ к репликам через Service.
+# Он один в Pod'е, поэтому порты по умолчанию (80/443) ничему не мешают.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multitool-client
+  labels:
+    app: multitool-client
+spec:
+  containers:
+    - name: multitool
+      image: wbitt/network-multitool:3.24.4

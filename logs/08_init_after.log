@@ -1,0 +1,22 @@
+$ kubectl apply -f manifests/2-service.yaml
+service/nginx-init-svc created
+$ kubectl wait --for=condition=Ready pod -l app=nginx-init --timeout=120s
+pod/nginx-init-86594fc7bb-8wz7x condition met
+$ kubectl get pods -l app=nginx-init
+NAME                          READY   STATUS    RESTARTS   AGE
+nginx-init-86594fc7bb-8wz7x   1/1     Running   0          39s
+$ kubectl logs -l app=nginx-init -c wait-for-service --tail=4
+
+Name:	nginx-init-svc.default.svc.cluster.local
+Address: 10.152.183.103
+
+$ kubectl describe pod -l app=nginx-init | grep -E "^(Status:|Init Containers:|Containers:)|^ +(State|Reason|Exit Code|Ready):"
+Status:           Running
+Init Containers:
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+    Ready:          True
+Containers:
+    State:          Running
+    Ready:          True

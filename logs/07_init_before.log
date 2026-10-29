@@ -1,0 +1,23 @@
+$ kubectl apply -f manifests/2-deployment.yaml
+deployment.apps/nginx-init created
+$ sleep 25; kubectl get pods -l app=nginx-init
+NAME                          READY   STATUS     RESTARTS   AGE
+nginx-init-86594fc7bb-8wz7x   0/1     Init:0/1   0          25s
+$ kubectl describe pod -l app=nginx-init | grep -E "^(Status:|Init Containers:|Containers:)|^ +(State|Reason|Ready):"
+Status:           Pending
+Init Containers:
+    State:          Running
+    Ready:          False
+Containers:
+    State:          Waiting
+      Reason:       PodInitializing
+    Ready:          False
+$ kubectl logs -l app=nginx-init -c wait-for-service --tail=6
+
+** server can't find nginx-init-svc.default.svc.cluster.local: NXDOMAIN
+
+** server can't find nginx-init-svc.default.svc.cluster.local: NXDOMAIN
+
+waiting for service nginx-init-svc
+$ kubectl get svc nginx-init-svc
+Error from server (NotFound): services "nginx-init-svc" not found

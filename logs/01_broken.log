@@ -1,0 +1,32 @@
+$ kubectl apply -f manifests/1-deployment-broken.yaml
+deployment.apps/nginx-multitool created
+$ sleep 75; kubectl get pods -l app=nginx-multitool
+NAME                               READY   STATUS   RESTARTS      AGE
+nginx-multitool-75cc86bd5f-7brt4   1/2     Error    3 (51s ago)   75s
+$ kubectl get pod -l app=nginx-multitool -o custom-columns=POD:.metadata.name,CONTAINER:.status.containerStatuses[*].name,READY:.status.containerStatuses[*].ready,RESTARTS:.status.containerStatuses[*].restartCount
+POD                                CONTAINER         READY        RESTARTS
+nginx-multitool-75cc86bd5f-7brt4   multitool,nginx   false,true   3,0
+$ kubectl logs -l app=nginx-multitool -c multitool --tail=4
+2026/10/29 14:55:00 [emerg] 1#1: bind() to 0.0.0.0:80 failed (98: Address in use)
+nginx: [emerg] bind() to 0.0.0.0:80 failed (98: Address in use)
+2026/10/29 14:55:00 [emerg] 1#1: still could not bind()
+nginx: [emerg] still could not bind()
+$ kubectl describe pod -l app=nginx-multitool | sed -n "/^  multitool:/,/Restart Count/p"
+  multitool:
+    Container ID:   containerd://3c0fbcd03d1058547ce665b72ea2b1efb476fe815644432a1ecb6a9e906c6321
+    Image:          wbitt/network-multitool:3.24.4
+    Image ID:       docker.io/wbitt/network-multitool@sha256:98d24ba5e94c74b153603dc4022aa15100ce33bccf7d0d59f8c2a3e088c90471
+    Port:           <none>
+    Host Port:      <none>
+    State:          Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Thu, 29 Oct 2026 21:55:00 +0700
+      Finished:     Thu, 29 Oct 2026 21:55:02 +0700
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Thu, 29 Oct 2026 21:54:30 +0700
+      Finished:     Thu, 29 Oct 2026 21:54:32 +0700
+    Ready:          False
+    Restart Count:  3

@@ -1,0 +1,5 @@
+$ kubectl get endpointslices -l kubernetes.io/service-name=nginx-init-svc
+NAME                   ADDRESSTYPE   PORTS   ENDPOINTS      AGE
+nginx-init-svc-p6b7t   IPv4          80      10.1.144.127   5s
+$ kubectl exec multitool-client -- curl -s -m 5 nginx-init-svc | grep "<title>"
+<title>Welcome to nginx!</title>

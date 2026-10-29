@@ -1,0 +1,8 @@
+$ kubectl apply -f manifests/1-service.yaml
+service/nginx-multitool-svc created
+$ kubectl get svc nginx-multitool-svc
+NAME                  TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)           AGE
+nginx-multitool-svc   ClusterIP   10.152.183.234   <none>        80/TCP,1180/TCP   0s
+$ kubectl get endpointslices -l kubernetes.io/service-name=nginx-multitool-svc
+NAME                        ADDRESSTYPE   PORTS     ENDPOINTS                   AGE
+nginx-multitool-svc-hfcch   IPv4          80,1180   10.1.144.120,10.1.144.121   0s

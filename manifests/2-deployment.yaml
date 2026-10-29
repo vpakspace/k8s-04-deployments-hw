@@ -1,0 +1,36 @@
+# nginx стартует только после того, как в DNS кластера появится Service nginx-init-svc:
+# пока init-контейнер не завершится успешно, основной контейнер не запускается.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-init
+  labels:
+    app: nginx-init
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-init
+  template:
+    metadata:
+      labels:
+        app: nginx-init
+    spec:
+      initContainers:
+        - name: wait-for-service
+          # nslookup по полному имени: код 0, если Service есть в DNS, и 1, если нет (проверено на busybox 1.28 и 1.36)
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              NS=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+              until nslookup nginx-init-svc.$NS.svc.cluster.local; do
+                echo "waiting for service nginx-init-svc"
+                sleep 2
+              done
+      containers:
+        - name: nginx
+          image: nginx:1.29-alpine
+          ports:
+            - containerPort: 80

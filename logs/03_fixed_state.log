@@ -1,0 +1,13 @@
+$ kubectl get pods -l app=nginx-multitool
+NAME                              READY   STATUS    RESTARTS   AGE
+nginx-multitool-8ccdd6fc7-dfs5j   2/2     Running   0          36s
+$ kubectl logs deploy/nginx-multitool -c multitool --tail=3
+WBITT Network MultiTool (with NGINX) - nginx-multitool-8ccdd6fc7-dfs5j - 10.1.144.120 - HTTP: 1180 , HTTPS: 11443 . (Formerly praqma/network-multitool)
+Replacing default HTTP port (80) with the value specified by the user - (HTTP_PORT: 1180).
+Replacing default HTTPS port (443) with the value specified by the user - (HTTPS_PORT: 11443).
+$ kubectl exec deploy/nginx-multitool -c multitool -- ss -tln
+State  Recv-Q Send-Q Local Address:Port  Peer Address:Port
+LISTEN 0      511          0.0.0.0:80         0.0.0.0:*
+LISTEN 0      511          0.0.0.0:1180       0.0.0.0:*
+LISTEN 0      511          0.0.0.0:11443      0.0.0.0:*
+LISTEN 0      511             [::]:80            [::]:*
